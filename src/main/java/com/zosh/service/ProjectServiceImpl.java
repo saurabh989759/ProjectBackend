@@ -30,15 +30,19 @@ public class ProjectServiceImpl implements ProjectService {
 	    @Override
 	    public Project createProject(Project project,Long id) throws UserException  {
 	    	User user = userService.findUserById(id);
-	    	Project createdProject=null;
+	    	Project createdProject=new Project();
 	    	if(user!=null) {
-	    		
-	    		
+				createdProject.setOwner(user);
+				createdProject.setTags(project.getTags());
+				createdProject.setName(project.getName());
+				createdProject.setCategory(project.getCategory());
+				createdProject.setDescription(project.getDescription());
 	    		createdProject=projectRepository.save(project);
 	    		
 	            Chat chat = new Chat();
 	            chat.setProject(createdProject);
-	            chatService.createChat(chat);
+	            Chat projectChat = chatService.createChat(chat);
+				createdProject.setChat(projectChat);
 	    	}
 	    
 	        return createdProject;

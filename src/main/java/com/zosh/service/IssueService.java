@@ -15,6 +15,8 @@ public interface IssueService {
 
 	    Optional<Issue> getIssueById(Long issueId) throws IssueException;
 
+	List<Issue> getIssueByProjectId(Long projectId) throws ProjectException;
+
 	    Issue createIssue(IssueRequest issue,Long userid) throws UserException, IssueException, ProjectException;
 
 	    Optional<Issue> updateIssue(Long issueid,IssueRequest updatedIssue,Long userid ) throws IssueException, UserException, ProjectException;

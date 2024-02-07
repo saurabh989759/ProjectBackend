@@ -74,10 +74,10 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Project>> getProjectsByOwner(@PathVariable Long userId, @RequestHeader("Authorization") String token) throws ProjectException {
+    @GetMapping("/user")
+    public ResponseEntity<List<Project>> getProjectsByOwner(@RequestHeader("Authorization") String token) throws ProjectException {
         try {
-            User owner = userService.findUserById(userId);
+            User owner = userService.findUserProfileByJwt(token);
             List<Project> projects = projectService.getProjectsByOwner(owner);
             return new ResponseEntity<>(projects, HttpStatus.OK);
         } catch (UserException e) {

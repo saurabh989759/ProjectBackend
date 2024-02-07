@@ -22,7 +22,7 @@ public class IssueDTO {
  private String title;
  private String description;
  private String status;
- private Long projID;
+ private Long projectID;
  private String priority;
  private LocalDate dueDate;
  private List<String> tags = new ArrayList<>();
@@ -31,4 +31,6 @@ public class IssueDTO {
  // Exclude assignee during serialization
 
  private List<User> assignee = new ArrayList<>();
+
+
 }

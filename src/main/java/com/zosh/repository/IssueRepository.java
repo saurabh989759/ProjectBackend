@@ -28,5 +28,7 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
     @Query("SELECT i.assignee FROM Issue i WHERE i.id = :issueId")
     List<User> findAssigneeByIssueId(@Param("issueId") Long issueId);
 
+    List<Issue> findByProjectId(Long projectId);
+
 
 }

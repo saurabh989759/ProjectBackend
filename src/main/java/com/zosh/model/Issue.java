@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "issues")
-@JsonIgnoreProperties({"assignee"})
+
 public class Issue {
 
     @Id
@@ -36,21 +36,16 @@ public class Issue {
     private String title;
     private String description;
     private String status;
-    private Long projID;
+    private Long projectID;
     private String priority;
     private LocalDate dueDate;
     private List<String> tags=new ArrayList<>();
-    @JsonIgnore
+
     @ManyToMany
-    @JoinTable(
-            name = "issue_assignees",
-            joinColumns = @JoinColumn(name = "issue_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
     private List<User> assignee = new ArrayList<>();
+
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "project_id")
     private Project project;
    
 

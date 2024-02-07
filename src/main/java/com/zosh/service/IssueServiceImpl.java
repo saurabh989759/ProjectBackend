@@ -47,15 +47,21 @@ public class IssueServiceImpl implements IssueService {
 	}
 
 	@Override
+	public List<Issue> getIssueByProjectId(Long projectId) throws ProjectException {
+		projectService.getProjectById(projectId);
+		return issueRepository.findByProjectId(projectId);
+	}
+
+	@Override
 	public Issue createIssue(IssueRequest issueRequest, Long userId)
 			throws UserException, IssueException, ProjectException {
 		User user = getUserOrThrow(userId);
 
 		// Check if the project exists
-		Project project = projectService.getProjectById(issueRequest.getProjId());
-		System.out.println("projid---------->"+issueRequest.getProjId());
+		Project project = projectService.getProjectById(issueRequest.getProjectId());
+		System.out.println("projid---------->"+issueRequest.getProjectId());
 		if (project == null) {
-			throw new IssueException("Project not found with ID: " + issueRequest.getProjId());
+			throw new IssueException("Project not found with ID: " + issueRequest.getProjectId());
 		}
 
 		// Create a new issue
@@ -63,17 +69,11 @@ public class IssueServiceImpl implements IssueService {
 		issue.setTitle(issueRequest.getTitle());
 		issue.setDescription(issueRequest.getDescription());
 		issue.setStatus(issueRequest.getStatus());
-		issue.setProjID(issueRequest.getProjId());
+		issue.setProjectID(issueRequest.getProjectId());
 		issue.setPriority(issueRequest.getPriority());
 		issue.setDueDate(issueRequest.getDueDate());
 
-		// Assign the user as an assignee
-		User assignee = userService.findUserById(issueRequest.getUserId());
-		if (assignee == null) {
-			throw new UserException("Assignee not found with ID: " + issueRequest.getUserId());
-		}
-		 notifyAssignee(assignee.getEmail(), "Issue Updated", "The issue has been updated.");
-		issue.getAssignee().add(assignee);
+
          
 		// Set the project for the issue
 		issue.setProject(project);
@@ -90,9 +90,9 @@ public class IssueServiceImpl implements IssueService {
                            
 		if (existingIssue.isPresent()) {
 			// Check if the project exists
-			Project project = projectService.getProjectById(updatedIssue.getProjId());
+			Project project = projectService.getProjectById(updatedIssue.getProjectId());
 			if (project == null) {
-				throw new IssueException("Project not found with ID: " + updatedIssue.getProjId());
+				throw new IssueException("Project not found with ID: " + updatedIssue.getProjectId());
 			}
 
 			User assignee = userService.findUserById(updatedIssue.getUserId());
