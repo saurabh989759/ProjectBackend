@@ -32,15 +32,17 @@ public class MessageController {
     private MessageService messageService;
 
     @Autowired
-    private UserService userService;  // Assuming you have a UserService for user-related operations
+    private UserService userService;
 
     @Autowired
-    private ProjectService projectService;  // Assuming you have a ChatService for chat-related operations
+    private ProjectService projectService;
 
-    // Other dependencies...
+
+
 
     @PostMapping("/send")
-    public ResponseEntity<Message> sendMessage(@RequestBody CreateMessageRequest request) throws UserException, ChatException, ProjectException {
+    public ResponseEntity<Message> sendMessage(@RequestBody CreateMessageRequest request)
+            throws UserException, ChatException, ProjectException {
         
         User user = userService.findUserById(request.getSenderId());  
         if(user==null) throw new UserException("user Not found with id "+request.getSenderId());
@@ -51,7 +53,8 @@ public class MessageController {
     }
 
     @GetMapping("/chat/{projectId}")
-    public ResponseEntity<List<Message>> getMessagesByChatId(@PathVariable Long projectId) throws ProjectException, ChatException {
+    public ResponseEntity<List<Message>> getMessagesByChatId(@PathVariable Long projectId)
+            throws ProjectException, ChatException {
         List<Message> messages = messageService.getMessagesByProjectId(projectId);
         return ResponseEntity.ok(messages);
     }

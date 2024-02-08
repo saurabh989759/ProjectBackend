@@ -20,94 +20,98 @@ import jakarta.transaction.Transactional;
 public class ProjectServiceImpl implements ProjectService {
 
 	 @Autowired
-	    private ProjectRepository projectRepository;
+	 private ProjectRepository projectRepository;
+
 	 @Autowired
 	 private ChatService chatService;
 	 
 	 @Autowired 
-	   private UserService userService;
+	 private UserService userService;
 
-	    @Override
-	    public Project createProject(Project project,Long id) throws UserException  {
-	    	User user = userService.findUserById(id);
-	    	Project createdProject=new Project();
-	    	if(user!=null) {
-				createdProject.setOwner(user);
-				createdProject.setTags(project.getTags());
-				createdProject.setName(project.getName());
-				createdProject.setCategory(project.getCategory());
-				createdProject.setDescription(project.getDescription());
-	    		createdProject=projectRepository.save(project);
-	    		
-	            Chat chat = new Chat();
-	            chat.setProject(createdProject);
-	            Chat projectChat = chatService.createChat(chat);
-				createdProject.setChat(projectChat);
-	    	}
-	    
-	        return createdProject;
-	    }
+	@Override
+	public Project createProject(Project project,Long id) throws UserException  {
+		User user = userService.findUserById(id);
+		Project createdProject=new Project();
+		if(user!=null) {
+			createdProject.setOwner(user);
+			createdProject.setTags(project.getTags());
+			createdProject.setName(project.getName());
+			createdProject.setCategory(project.getCategory());
+			createdProject.setDescription(project.getDescription());
+			createdProject.getTeam().add(user);
+			createdProject=projectRepository.save(project);
 
-	    @Override
-	    public List<Project> getProjectsByOwner(User owner) throws ProjectException {
-	       List<Project> projects = projectRepository.findByOwner(owner);
-	       if(projects!=null) {
-	    	   return projects;
-	       }
-	       throw new ProjectException("No Projects found");
-	    }
+			Chat chat = new Chat();
+			chat.setProject(createdProject);
+			Chat projectChat = chatService.createChat(chat);
+			createdProject.setChat(projectChat);
+		}
+		return createdProject;
+	}
 
-	    @Override
+//	@Override
+//	public List<Project> getProjectsByOwner(User owner) throws ProjectException {
+//		return projectRepository.findByOwner(owner);
+//	}
+
+
+
+	@Override
+	public List<Project> getProjectsByTeam(User user) throws ProjectException {
+		return projectRepository.findProjectsByTeam(user);
+	}
+
+	@Override
 	    public List<Project> getAllProjects() throws ProjectException {
 	        List<Project> projects = projectRepository.findAll();
 	        if(projects!=null) return projects;
 	        throw new ProjectException("No projects found");
 	    }
 
-	    @Override
-	    public Project getProjectById(Long projectId) throws ProjectException {
-	        Optional<Project> project = projectRepository.findById(projectId);
-	        if(project.isPresent()) {
-	        	return project.get();
-	        }
-	        throw new ProjectException("No project exists with the id "+projectId);
-	    }
+	@Override
+	public Project getProjectById(Long projectId) throws ProjectException {
+		Optional<Project> project = projectRepository.findById(projectId);
+		if(project.isPresent()) {
+			return project.get();
+		}
+		throw new ProjectException("No project exists with the id "+projectId);
+	}
 
-	    @Override
-	    public String deleteProject(Long projectId,Long id) throws UserException {
-	    	User user = userService.findUserById(id);
-	    	System.out.println("user ____>"+user);
-	    	if(user!=null) {
-	              projectRepository.deleteById(projectId);
-	              return "project deleted";
-	    } 
-	    	throw new UserException("User doesnot exists");
-	    }
+	@Override
+	public String deleteProject(Long projectId,Long id) throws UserException {
+		User user = userService.findUserById(id);
+		System.out.println("user ____>"+user);
+		if(user!=null) {
+			  projectRepository.deleteById(projectId);
+			  return "project deleted";
+	}
+		throw new UserException("User doesnot exists");
+	}
 
-	    @Override
-	    public Project updateProject(Project updatedProject, Long id) throws ProjectException {
-	        Project project = getProjectById(id);
+	@Override
+	public Project updateProject(Project updatedProject, Long id) throws ProjectException {
+		Project project = getProjectById(id);
 
-	        if (project != null) {
-	            // Update the existing project with the fields from updatedProject
-	            if (updatedProject.getName() != null) {
-	                project.setName(updatedProject.getName());
-	            }
+		if (project != null) {
+			// Update the existing project with the fields from updatedProject
+			if (updatedProject.getName() != null) {
+				project.setName(updatedProject.getName());
+			}
 
-	            if (updatedProject.getDescription() != null) {
-	                project.setDescription(updatedProject.getDescription());
-	            }
+			if (updatedProject.getDescription() != null) {
+				project.setDescription(updatedProject.getDescription());
+			}
 
-	            if (updatedProject.getTags() != null) {
-	                project.setTags(updatedProject.getTags());
-	            }
+			if (updatedProject.getTags() != null) {
+				project.setTags(updatedProject.getTags());
+			}
 
-	            // Save the updated project once
-	            return projectRepository.save(project);
-	        }
+			// Save the updated project once
+			return projectRepository.save(project);
+		}
 
-	        throw new ProjectException("Project does not exist");
-	    }
+		throw new ProjectException("Project does not exist");
+	}
 
 	    @Override
 	    public List<Project> searchProjects(String keyword, String category, String tag) throws ProjectException {
@@ -124,12 +128,18 @@ public class ProjectServiceImpl implements ProjectService {
 	        Project project = projectRepository.findById(projectId).orElseThrow(() -> new ProjectException("project not found"));
 	        User user = userService.findUserById(userId);
 
-	        if (project != null && user != null) {
-	            project.getChat().getUsers().add(user);
-	            projectRepository.save(project);
-	            return "user added to the project";
-	        }
-			return "user not added to project either project does not exist or user";
+	        if (!project.getTeam().contains(user)) {
+				project.getChat().getUsers().add(user);
+				project.getTeam().add(user);
+				projectRepository.save(project);
+				return "user added to the project";
+			}
+			else{
+				project.getTeam().remove(user);
+				project.getChat().getUsers().remove(user);
+				return "user remove from project";
+			}
+
 	    }
 
 	    @Override

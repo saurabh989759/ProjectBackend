@@ -74,17 +74,28 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
+//    @GetMapping("/user")
+//    public ResponseEntity<List<Project>> getProjectsByOwner(@RequestHeader("Authorization") String token) throws ProjectException {
+//        try {
+//            User owner = userService.findUserProfileByJwt(token);
+//            List<Project> projects = projectService.getProjectsByOwner(owner);
+//            return new ResponseEntity<>(projects, HttpStatus.OK);
+//        } catch (UserException e) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//    }
+
     @GetMapping("/user")
-    public ResponseEntity<List<Project>> getProjectsByOwner(@RequestHeader("Authorization") String token) throws ProjectException {
+    public ResponseEntity<List<Project>> getProjectsByTeam(@RequestHeader("Authorization") String token) throws ProjectException {
         try {
-            User owner = userService.findUserProfileByJwt(token);
-            List<Project> projects = projectService.getProjectsByOwner(owner);
+            User user = userService.findUserProfileByJwt(token);
+            List<Project> projects = projectService.getProjectsByTeam(null);
             return new ResponseEntity<>(projects, HttpStatus.OK);
         } catch (UserException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    
+
     @GetMapping("/search")
     public ResponseEntity< List<Project>> searchProjects(@RequestParam(required = false) String keyword,
                                        @RequestParam(required = false) String category,

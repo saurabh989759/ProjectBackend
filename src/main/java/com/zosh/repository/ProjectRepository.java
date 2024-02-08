@@ -17,6 +17,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 	    @Query("SELECT p FROM Project p WHERE p.name LIKE %?1% AND p.category LIKE %?2% AND p.description LIKE %?3%")
 	    List<Project> searchProjects(String name, String category, String description);
 
-		
+	@Query("SELECT p FROM Project p JOIN p.team t WHERE t = :user")
+	List<Project> findProjectsByTeam(@Param("user") User user);
 
 }

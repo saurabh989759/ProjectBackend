@@ -12,7 +12,9 @@ import com.zosh.model.User;
 public interface ProjectService {
 	Project createProject(Project project, Long userId) throws UserException;
 
-	List<Project> getProjectsByOwner(User owner) throws ProjectException;
+//	List<Project> getProjectsByOwner(User owner) throws ProjectException;
+
+	List<Project> getProjectsByTeam(User user) throws ProjectException;
 
 	List<Project> getAllProjects() throws ProjectException;
 
