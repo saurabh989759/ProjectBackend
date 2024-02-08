@@ -29,4 +29,6 @@ public interface ProjectService {
 	Chat getChatByProjectId(Long projectId) throws ProjectException, ChatException;
 
 	List<User> getUsersByProjectId(Long projectId) throws ProjectException;
+	
+	 public void addUserToProjectTeam(String token,Long projectId, String userEmail) throws UserException, ProjectException;
 }

@@ -23,6 +23,8 @@ public class ProjectServiceImpl implements ProjectService {
 	    private ProjectRepository projectRepository;
 	 @Autowired
 	 private ChatService chatService;
+	 @Autowired
+	 private InviteTokenService inviteTokenService;
 	 
 	 @Autowired 
 	   private UserService userService;
@@ -144,6 +146,43 @@ public class ProjectServiceImpl implements ProjectService {
 	        
 	        throw new ProjectException("no project found with id "+projectId);
 	    }
+	    public void addUserToProjectTeam(String token,Long projectId, String userEmail) throws UserException, ProjectException {
+	        Optional<Project> optionalProject = projectRepository.findById(projectId);
+	         User user = userService.findUserByEmail(userEmail);  
+	         if(user==null) {
+	        	 throw new UserException("User Does not exists");
+	         }
+	         String dbToken = inviteTokenService.getTokenByUserMail(userEmail);
+	         
+	         if(!token.equals(dbToken)) {
+	        	 throw new ProjectException("Token missmatch");
+	         }
+
+	        if (optionalProject.isPresent()) {
+	            Project project = optionalProject.get();
+
+	            // Check if the user is already part of the project team
+	            if (isUserAlreadyInProject(project, userEmail)) {
+	                // You may throw an exception or handle it as per your requirements
+	                throw new UserException("User is already part of the project team");
+	            }
+
+	            // Add the user to the project team
+	            project.getTeam().add(user);
+                project.getChat().getUsers().add(user);
+	            // Save the updated project
+	            projectRepository.save(project);
+	        } else {
+	            // Handle the case when the project is not found
+	            throw new ProjectException("Project not found with id: " + projectId);
+	        }
+	    }
+
+	    private boolean isUserAlreadyInProject(Project project, String userEmail) {
+	        // Check if the user is already part of the project team
+	        return project.getTeam().stream().anyMatch(user -> user.getEmail().equals(userEmail));
+	    }
+	
 	    
 	    
 }

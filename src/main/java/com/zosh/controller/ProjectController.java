@@ -21,9 +21,12 @@ import com.zosh.exception.UserException;
 import com.zosh.model.Chat;
 import com.zosh.model.Project;
 import com.zosh.model.User;
+import com.zosh.request.TokenValidationRequest;
 import com.zosh.response.MessageResponse;
+import com.zosh.service.EmailService;
 import com.zosh.service.ProjectService;
 import com.zosh.service.UserService;
+import com.zosh.util.TokenGenerator;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -34,6 +37,9 @@ public class ProjectController {
 
     @Autowired
     private UserService userService;
+    
+     @Autowired
+    private EmailService emailService;
 
     @GetMapping
     public ResponseEntity<List<Project>> getAllProjects() throws ProjectException {
@@ -110,6 +116,23 @@ public class ProjectController {
     public ResponseEntity<List<User>> getUsersByProjectId(@PathVariable Long projectId) throws ProjectException {
         List<User> users = projectService.getUsersByProjectId(projectId);
         return ResponseEntity.ok(users);
+    }
+    
+    @GetMapping("/invite")
+    public ResponseEntity<String> inviteToProject(@RequestParam String userEmail, @RequestParam Long projectId) {
+        String token = TokenGenerator.generateToken(userEmail,projectId,64);
+        try {
+            emailService.sendEmailWithToken(userEmail, token);
+            return ResponseEntity.ok("User invited to the project successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to send email or invite user to the project");
+        }
+    }
+    
+    @PostMapping("/invite/validate")
+    public ResponseEntity<String> validateTokenAndAddToTeam(@RequestBody TokenValidationRequest request) throws UserException, ProjectException {
+        projectService.addUserToProjectTeam(request.getToken(), request.getProjectId(), request.getUserEmail());
+        return ResponseEntity.ok("User added to the project team successfully");
     }
 
     
