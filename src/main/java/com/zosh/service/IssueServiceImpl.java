@@ -102,11 +102,7 @@ public class IssueServiceImpl implements IssueService {
 
 			Issue issueToUpdate = existingIssue.get();
 
-			// Clear existing assignees and add the new assignee
-			issueToUpdate.getAssignee().clear();
-			issueToUpdate.getAssignee().add(assignee);
 
-			// Update issue fields
 			if (updatedIssue.getDescription() != null) {
 				issueToUpdate.setDescription(updatedIssue.getDescription());
 			}
@@ -126,9 +122,7 @@ public class IssueServiceImpl implements IssueService {
 			if (updatedIssue.getTitle() != null) {
 				issueToUpdate.setTitle(updatedIssue.getTitle());
 			}
-             for(User u:existingIssue.get().getAssignee()) {
-            	 notifyAssignee(u.getEmail(), "Issue Updated", "The issue has been updated.");
-             }
+
 			// Save the updated issue
 			return Optional.of(issueRepository.save(issueToUpdate));
 		}
@@ -178,36 +172,21 @@ public class IssueServiceImpl implements IssueService {
 
 	@Override
 	public List<User> getAssigneeForIssue(Long issueId) throws IssueException {
-		Optional<Issue> issue = getIssueById(issueId);
-		if (issue.isPresent()) {
-			return issue.get().getAssignee();
-		}
-		throw new IssueException("Issue not found with issueid" + issueId);
+	return null;
 	}
 
 	@Override
-	public String addUserToIssue(Long issueId, Long userId) throws UserException, IssueException {
+	public Issue addUserToIssue(Long issueId, Long userId) throws UserException, IssueException {
 		User user = userService.findUserById(userId);
-		if (user == null) {
-			throw new UserException("User not found");
-		}
+		Optional<Issue> issue=getIssueById(issueId);
 
-		Optional<Issue> issueOptional = issueRepository.findById(issueId);
-		if (issueOptional.isPresent()) {
-			Issue issue = issueOptional.get();
-			List<User> assignees = issue.getAssignee();
+		if(issue.isEmpty())throw new IssueException("issue not exist");
 
-			if (!assignees.contains(user)) {
-				 notifyAssignee(user.getEmail(), "Issue Updated", "Hello user you have been added to resolve this issue with issue id"+issue.getId());
-				assignees.add(user);
-				issueRepository.save(issue);
-				return "User added to the issue";
-			} else {
-				return "User is already assigned to the issue";
-			}
-		} else {
-			throw new IssueException("Issue not found");
-		}
+		issue.get().setAssignee(user);
+		notifyAssignee(user.getEmail(),"New Issue Assigned To You","New Issue Assign To You");
+		return issueRepository.save(issue.get());
+
+
 	}
 	 private void notifyAssignee(String email, String subject, String body) {
 		 System.out.println("IssueServiceImpl.notifyAssignee()");

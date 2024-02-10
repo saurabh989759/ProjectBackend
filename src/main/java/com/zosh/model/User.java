@@ -6,12 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,7 +28,7 @@ public class User {
 	private String role;
 	
 	@JsonIgnore
-	@ManyToMany(mappedBy = "assignee", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL)
     private List<Issue> assignedIssues = new ArrayList<>();
   
 

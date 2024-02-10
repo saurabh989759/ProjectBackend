@@ -30,7 +30,7 @@ public class IssueDTO {
 
  // Exclude assignee during serialization
 
- private List<User> assignee = new ArrayList<>();
+ private User assignee;
 
 
 }

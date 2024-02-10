@@ -127,20 +127,13 @@ public class IssueController {
     }
 
 
-    @PostMapping("/{issueId}/assignee/{userId}")
-    public ResponseEntity<MessageResponse> addUserToIssue(@PathVariable Long issueId, @PathVariable Long userId) throws UserException, IssueException {
+    @PutMapping ("/{issueId}/assignee/{userId}")
+    public ResponseEntity<Issue> addUserToIssue(@PathVariable Long issueId, @PathVariable Long userId) throws UserException, IssueException {
        
-            String result = issueService.addUserToIssue(issueId, userId);
-            MessageResponse response=new MessageResponse();
-            response.setMessage(result);
-            return ResponseEntity.ok(response);
-        
-    }
+            Issue issue = issueService.addUserToIssue(issueId, userId);
 
-    @GetMapping("/{issueId}/assignee")
-    public ResponseEntity<List<User>> getAssigneeForIssue(@PathVariable Long issueId) throws IssueException {
-        List<User> assignee = issueService.getAssigneeForIssue(issueId);
-        return ResponseEntity.ok(assignee);
+            return ResponseEntity.ok(issue);
+        
     }
 
     @GetMapping("/assignee/{assigneeId}")

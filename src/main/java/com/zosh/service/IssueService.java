@@ -29,6 +29,6 @@ public interface IssueService {
 	    
 	    List<User> getAssigneeForIssue(Long issueId) throws IssueException;
 
-	    String addUserToIssue(Long issueId, Long userId) throws UserException, IssueException;
+	    Issue addUserToIssue(Long issueId, Long userId) throws UserException, IssueException;
 
 }

@@ -41,8 +41,8 @@ public class Issue {
     private LocalDate dueDate;
     private List<String> tags=new ArrayList<>();
 
-    @ManyToMany
-    private List<User> assignee = new ArrayList<>();
+    @ManyToOne
+    private User assignee;
 
     @JsonIgnore
     @ManyToOne

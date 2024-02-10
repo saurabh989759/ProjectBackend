@@ -43,7 +43,7 @@ public class Project {
 
 
     @ManyToMany
-    private List<User> team=new ArrayList<>();
+    private List<User> team = new ArrayList<>();
 
 }
 
