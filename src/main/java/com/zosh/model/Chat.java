@@ -44,8 +44,5 @@ public class Chat {
     )
     private List<User> users=new ArrayList<User>();
 
-    // Other fields as needed
-
-    // Constructors, getters, and setters
 }
 

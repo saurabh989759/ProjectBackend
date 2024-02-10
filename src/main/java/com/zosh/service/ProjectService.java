@@ -26,9 +26,12 @@ public interface ProjectService {
 	
 	List<Project> searchProjects(String keyword, String category, String tag) throws ProjectException;
 
-	String addUserToProject(Long projectId, Long userId) throws UserException, ProjectException;
+	void addUserToProject(Long projectId, Long userId) throws UserException, ProjectException;
+
+	void removeUserFromProject(Long projectId, Long userId) throws UserException, ProjectException;
 
 	Chat getChatByProjectId(Long projectId) throws ProjectException, ChatException;
 
 	List<User> getUsersByProjectId(Long projectId) throws ProjectException;
+	
 }

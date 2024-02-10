@@ -1,6 +1,11 @@
 package com.zosh.controller;
 import java.util.List;
 
+import com.zosh.exception.MailsException;
+import com.zosh.model.Invitation;
+import com.zosh.request.ProjectInvitationRequest;
+import com.zosh.service.InvitationService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +26,12 @@ import com.zosh.exception.UserException;
 import com.zosh.model.Chat;
 import com.zosh.model.Project;
 import com.zosh.model.User;
+import com.zosh.request.TokenValidationRequest;
 import com.zosh.response.MessageResponse;
+import com.zosh.service.EmailService;
 import com.zosh.service.ProjectService;
 import com.zosh.service.UserService;
+import com.zosh.util.TokenGenerator;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -34,6 +42,10 @@ public class ProjectController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private InvitationService invitationService;
+    
 
     @GetMapping
     public ResponseEntity<List<Project>> getAllProjects() throws ProjectException {
@@ -112,15 +124,41 @@ public class ProjectController {
     }
     
     @GetMapping("/{projectId}/chat")
-    public ResponseEntity<Chat> getChatByProjectId(@PathVariable Long projectId) throws ProjectException, ChatException {
+    public ResponseEntity<Chat> getChatByProjectId(@PathVariable Long projectId)
+            throws ProjectException, ChatException {
         Chat chat = projectService.getChatByProjectId(projectId);
         return chat != null ? ResponseEntity.ok(chat) : ResponseEntity.notFound().build();
     }
     
     @GetMapping("/{projectId}/users")
-    public ResponseEntity<List<User>> getUsersByProjectId(@PathVariable Long projectId) throws ProjectException {
+    public ResponseEntity<List<User>> getUsersByProjectId(@PathVariable Long projectId)
+            throws ProjectException {
         List<User> users = projectService.getUsersByProjectId(projectId);
         return ResponseEntity.ok(users);
+    }
+    
+    @PostMapping("/invite")
+    public ResponseEntity<MessageResponse> inviteToProject(
+            @RequestBody ProjectInvitationRequest req) throws MailsException, MessagingException {
+
+        invitationService.sendInvitation(req.getEmail(), req.getProjectId());
+
+            MessageResponse res=new MessageResponse();
+            res.setMessage("User invited to the project successfully");
+            return ResponseEntity.ok(res);
+
+    }
+
+    @GetMapping("/accept_invitation")
+    public String acceptInvitation(@RequestParam String token,
+                                   @RequestHeader("Authorization") String jwt) throws Exception {
+
+        User user=userService.findUserProfileByJwt(jwt);
+
+        Invitation invitation = invitationService.acceptInvitation(token,user.getId());
+        projectService.addUserToProject(invitation.getProjectId(),user.getId());
+
+        return "Invitation accepted successfully";
     }
 
     

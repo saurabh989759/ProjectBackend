@@ -24,6 +24,8 @@ public class ProjectServiceImpl implements ProjectService {
 
 	 @Autowired
 	 private ChatService chatService;
+	 @Autowired
+	 private InvitationService inviteTokenService;
 	 
 	 @Autowired 
 	 private UserService userService;
@@ -49,10 +51,7 @@ public class ProjectServiceImpl implements ProjectService {
 		return createdProject;
 	}
 
-//	@Override
-//	public List<Project> getProjectsByOwner(User owner) throws ProjectException {
-//		return projectRepository.findByOwner(owner);
-//	}
+
 
 
 
@@ -124,7 +123,7 @@ public class ProjectServiceImpl implements ProjectService {
 	    
 	    @Override
 	    @Transactional
-	    public String addUserToProject(Long projectId, Long userId) throws UserException, ProjectException {
+	    public void addUserToProject(Long projectId, Long userId) throws UserException, ProjectException {
 	        Project project = projectRepository.findById(projectId).orElseThrow(() -> new ProjectException("project not found"));
 	        User user = userService.findUserById(userId);
 
@@ -132,17 +131,25 @@ public class ProjectServiceImpl implements ProjectService {
 				project.getChat().getUsers().add(user);
 				project.getTeam().add(user);
 				projectRepository.save(project);
-				return "user added to the project";
 			}
-			else{
-				project.getTeam().remove(user);
-				project.getChat().getUsers().remove(user);
-				return "user remove from project";
-			}
+
 
 	    }
 
-	    @Override
+	@Override
+	public void removeUserFromProject(Long projectId, Long userId) throws UserException, ProjectException {
+		Project project = projectRepository.findById(projectId)
+				.orElseThrow(() -> new ProjectException("project not found"));
+		User user = userService.findUserById(userId);
+
+		if (project.getTeam().contains(user)) {
+			project.getTeam().remove(user);
+			project.getChat().getUsers().remove(user);
+		}
+
+	}
+
+	@Override
 	    public Chat getChatByProjectId(Long projectId) throws ProjectException, ChatException {
 	        Project project = projectRepository.findById(projectId).orElseThrow(()-> new ProjectException("Project not found"));
 	        if( project != null ) return project.getChat() ;
@@ -158,6 +165,7 @@ public class ProjectServiceImpl implements ProjectService {
 	        
 	        throw new ProjectException("no project found with id "+projectId);
 	    }
+	
 	    
 	    
 }
