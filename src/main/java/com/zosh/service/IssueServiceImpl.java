@@ -188,7 +188,20 @@ public class IssueServiceImpl implements IssueService {
 
 
 	}
-	 private void notifyAssignee(String email, String subject, String body) {
+
+	@Override
+	public Issue updateStatus(Long issueId, String status) throws IssueException {
+		Optional<Issue> optionalIssue=issueRepository.findById(issueId);
+		if(optionalIssue.isEmpty()){
+			throw new IssueException("issue not found");
+		}
+		Issue issue=optionalIssue.get();
+		issue.setStatus(status);
+
+		return issueRepository.save(issue);
+	}
+
+	private void notifyAssignee(String email, String subject, String body) {
 		 System.out.println("IssueServiceImpl.notifyAssignee()");
 	        notificationServiceImpl.sendNotification(email, subject, body);
 	    }

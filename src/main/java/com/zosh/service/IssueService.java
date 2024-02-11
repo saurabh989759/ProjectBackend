@@ -31,4 +31,6 @@ public interface IssueService {
 
 	    Issue addUserToIssue(Long issueId, Long userId) throws UserException, IssueException;
 
+		Issue updateStatus(Long issueId, String status) throws IssueException;
+
 }

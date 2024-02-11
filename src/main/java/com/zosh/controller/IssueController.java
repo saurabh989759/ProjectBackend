@@ -141,6 +141,15 @@ public class IssueController {
         List<Issue> issues = issueService.getIssuesByAssigneeId(assigneeId);
         return ResponseEntity.ok(issues);
     }
-  
+
+    @PutMapping("/{issueId}/status/{status}")
+    public ResponseEntity<Issue>updateIssueStatus(
+            @PathVariable String status,
+            @PathVariable Long issueId) throws IssueException {
+        Issue issue = issueService.updateStatus(issueId,status);
+        return ResponseEntity.ok(issue);
+    }
+
+
 }
 
