@@ -27,7 +27,9 @@ public class Comment {
     private LocalDateTime createdDateTime;
 
     @ManyToOne
-    @JoinColumn(name = "issue_id")
+    private User user;
+
+    @ManyToOne
     private Issue issue;
 
 }
