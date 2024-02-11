@@ -48,8 +48,12 @@ public class ProjectController {
     
 
     @GetMapping
-    public ResponseEntity<List<Project>> getAllProjects() throws ProjectException {
-        List<Project> projects = projectService.getAllProjects();
+    public ResponseEntity<List<Project>> getProjects(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String tag,
+            @RequestHeader("Authorization") String token) throws ProjectException, UserException {
+        User user = userService.findUserProfileByJwt(token);
+        List<Project> projects = projectService.getProjectsByTeam(user,category,tag);
         return new ResponseEntity<>(projects, HttpStatus.OK);
     }
 
@@ -62,7 +66,9 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<Project> createProject(@RequestBody Project project, @RequestHeader("Authorization") String token) throws UserException {
+    public ResponseEntity<Project> createProject(
+            @RequestBody Project project,
+                                                 @RequestHeader("Authorization") String token) throws UserException {
         User user = userService.findUserProfileByJwt(token);
         project.setOwner(user);
         Project createdProject = projectService.createProject(project, user.getId());
@@ -97,27 +103,22 @@ public class ProjectController {
 //        }
 //    }
 
-    @GetMapping("/user")
-    public ResponseEntity<List<Project>> getProjectsByTeam(@RequestHeader("Authorization") String token) throws ProjectException {
-        try {
-            User user = userService.findUserProfileByJwt(token);
-            List<Project> projects = projectService.getProjectsByTeam(null);
-            return new ResponseEntity<>(projects, HttpStatus.OK);
-        } catch (UserException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+
 
     @GetMapping("/search")
-    public ResponseEntity< List<Project>> searchProjects(@RequestParam(required = false) String keyword,
-                                       @RequestParam(required = false) String category,
-                                       @RequestParam(required = false) String tag) throws ProjectException {
-            List<Project> projects = projectService.searchProjects(keyword, category, tag);
+    public ResponseEntity< List<Project>> searchProjects(
+            @RequestParam(required = false) String keyword,
+            @RequestHeader("Authorization") String jwt
+    ) throws ProjectException, UserException {
+        User user=userService.findUserProfileByJwt(jwt);
+            List<Project> projects = projectService.searchProjects(keyword,user);
             return ResponseEntity.ok(projects);
     }
     
     @PostMapping("/{userId}/add-to-project/{projectId}")
-    public ResponseEntity<MessageResponse> addUserToProject(@PathVariable Long userId, @PathVariable Long projectId) throws UserException, ProjectException {
+    public ResponseEntity<MessageResponse> addUserToProject(
+            @PathVariable Long userId,
+            @PathVariable Long projectId) throws UserException, ProjectException {
         projectService.addUserToProject(projectId, userId);
         MessageResponse response =new MessageResponse("User added to the project successfully");
         return ResponseEntity.ok(response);
@@ -130,12 +131,7 @@ public class ProjectController {
         return chat != null ? ResponseEntity.ok(chat) : ResponseEntity.notFound().build();
     }
     
-    @GetMapping("/{projectId}/users")
-    public ResponseEntity<List<User>> getUsersByProjectId(@PathVariable Long projectId)
-            throws ProjectException {
-        List<User> users = projectService.getUsersByProjectId(projectId);
-        return ResponseEntity.ok(users);
-    }
+
     
     @PostMapping("/invite")
     public ResponseEntity<MessageResponse> inviteToProject(

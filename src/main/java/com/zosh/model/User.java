@@ -31,9 +31,9 @@ public class User {
 	@OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL)
     private List<Issue> assignedIssues = new ArrayList<>();
 	
-    @JsonIgnore
-    @ManyToMany(mappedBy = "team")
-    private List<Project> projects = new ArrayList<>();
-  
+//    @JsonIgnore
+//    @ManyToMany(mappedBy = "team")
+//    private List<Project> projects = new ArrayList<>();
+//
 
 }

@@ -2,6 +2,7 @@ package com.zosh.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,38 +35,47 @@ public class ProjectServiceImpl implements ProjectService {
 	public Project createProject(Project project,Long id) throws UserException  {
 		User user = userService.findUserById(id);
 		Project createdProject=new Project();
-		if(user!=null) {
+
 			createdProject.setOwner(user);
 			createdProject.setTags(project.getTags());
 			createdProject.setName(project.getName());
 			createdProject.setCategory(project.getCategory());
 			createdProject.setDescription(project.getDescription());
 			createdProject.getTeam().add(user);
-			createdProject=projectRepository.save(project);
+
+			System.out.println(createdProject);
+			Project savedProject=projectRepository.save(project);
+
+			savedProject.getTeam().add(user);
 
 			Chat chat = new Chat();
-			chat.setProject(createdProject);
+			chat.setProject(savedProject);
 			Chat projectChat = chatService.createChat(chat);
-			createdProject.setChat(projectChat);
+			savedProject.setChat(projectChat);
+
+		return savedProject;
+	}
+
+	@Override
+	public List<Project> getProjectsByTeam(User user,String category,String tag) throws ProjectException {
+		List<Project> projects= projectRepository.findByTeamContainingOrOwner(user,user);
+
+		if (category != null) {
+			projects = projects.stream()
+					.filter(project -> project.getCategory().equals(category))
+					.collect(Collectors.toList());
 		}
-		return createdProject;
+
+		if (tag != null) {
+			projects = projects.stream()
+					.filter(project -> project.getTags().contains(tag))
+					.collect(Collectors.toList());
+		}
+
+		return projects;
 	}
 
 
-
-
-
-	@Override
-	public List<Project> getProjectsByTeam(User user) throws ProjectException {
-		return projectRepository.findProjectsByTeam(user);
-	}
-
-	@Override
-	    public List<Project> getAllProjects() throws ProjectException {
-	        List<Project> projects = projectRepository.findAll();
-	        if(projects!=null) return projects;
-	        throw new ProjectException("No projects found");
-	    }
 
 	@Override
 	public Project getProjectById(Long projectId) throws ProjectException {
@@ -113,8 +123,10 @@ public class ProjectServiceImpl implements ProjectService {
 	}
 
 	    @Override
-	    public List<Project> searchProjects(String keyword, String category, String tag) throws ProjectException {
-	        List<Project> list = projectRepository.searchProjects(keyword, category, tag);
+	    public List<Project> searchProjects(String keyword, User user) throws ProjectException {
+			String partialName = "%" + keyword + "%";
+//			projectRepository.findByPartialNameAndTeamIn(partialName, user);
+	        List<Project> list = projectRepository.findByNameContainingAndTeamContains(keyword,user);
 	        if(list!=null) {
 	        	return list;
 	        }
@@ -158,7 +170,7 @@ public class ProjectServiceImpl implements ProjectService {
 	        	throw new ChatException("no chats found");
 	       
 	    }
-	    @Override
+
 	    public List<User> getUsersByProjectId(Long projectId) throws ProjectException {
 	        Project project = projectRepository.findById(projectId).orElse(null);
 	        if( project != null) return project.getChat().getUsers();
