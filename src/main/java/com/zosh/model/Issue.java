@@ -51,7 +51,7 @@ public class Issue {
     private Project project;
     
     @JsonIgnore
-    @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
    
 }

@@ -146,7 +146,7 @@ public class ProjectController {
     }
 
     @GetMapping("/accept_invitation")
-    public String acceptInvitation(@RequestParam String token,
+    public ResponseEntity<Invitation> acceptInvitation(@RequestParam String token,
                                    @RequestHeader("Authorization") String jwt) throws Exception {
 
         User user=userService.findUserProfileByJwt(jwt);
@@ -154,7 +154,7 @@ public class ProjectController {
         Invitation invitation = invitationService.acceptInvitation(token,user.getId());
         projectService.addUserToProject(invitation.getProjectId(),user.getId());
 
-        return "Invitation accepted successfully";
+        return new ResponseEntity<>(invitation,HttpStatus.ACCEPTED);
     }
 
     
