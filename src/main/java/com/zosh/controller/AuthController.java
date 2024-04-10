@@ -1,6 +1,9 @@
 package com.zosh.controller;
 
 
+import com.zosh.model.Subscription;
+import com.zosh.repository.SubscriptionRepository;
+import com.zosh.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +42,12 @@ public class AuthController {
 	@Autowired
     private UserService userService;
 
+	@Autowired
+	private SubscriptionService subscriptionService;
+
+	@Autowired
+	private SubscriptionRepository subscriptionRepository;
+
 	
 
 	@PostMapping("/signup")
@@ -65,16 +74,12 @@ public class AuthController {
 		createdUser.setRole(role);
 
 		User savedUser = userRepository.save(createdUser);
-		
-//		Cart cart = new Cart();
-//		cart.setCustomer(savedUser);
-//		Cart savedCart = cartRepository.save(cart);
-//		savedUser.setCart(savedCart);
-		userRepository.save(savedUser);
-		
-	
-		
-		
+
+		Subscription subscription = subscriptionService.createSubscription(savedUser);
+
+		savedUser.setSubscription(subscription);
+
+		subscriptionRepository.save(subscription);
 
 		Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);
 		SecurityContextHolder.getContext().setAuthentication(authentication);

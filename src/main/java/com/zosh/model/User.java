@@ -30,6 +30,9 @@ public class User {
 	@JsonIgnore
 	@OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL)
     private List<Issue> assignedIssues = new ArrayList<>();
+
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+	private Subscription subscription;
 	
 //    @JsonIgnore
 //    @ManyToMany(mappedBy = "team")
