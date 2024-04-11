@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.zosh.exception.ProjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -29,11 +30,19 @@ public class UserServiceImplementation implements UserService {
 	@Autowired
 	private JavaMailSender javaMailSender;
 
+//	@Autowired
+//	private ProjectService projectService;
+
 	@Override
-	public User findUserProfileByJwt(String jwt) throws UserException {
+	public User findUserProfileByJwt(String jwt) throws UserException, ProjectException {
 		String email = JwtProvider.getEmailFromJwtToken(jwt);
 
 		User user = userRepository.findByEmail(email);
+
+//		int projectSize=projectService.getProjectsByTeam(user,null,null).size();
+//		user.setProjectSize(projectSize);
+
+		userRepository.save(user);
 
 		if (user == null) {
 			throw new UserException("user not exist with email " + email);
@@ -62,6 +71,12 @@ public class UserServiceImplementation implements UserService {
 			throw new UserException("user not found with id " + userId);
 		}
 		return opt.get();
+	}
+
+	@Override
+	public User updateUsersProjectSize(User user, int number) {
+		user.setProjectSize(user.getProjectSize()+number);
+		return userRepository.save(user);
 	}
 
 	@Override

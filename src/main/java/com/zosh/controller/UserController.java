@@ -1,5 +1,6 @@
 package com.zosh.controller;
 
+import com.zosh.exception.ProjectException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,7 @@ public class UserController {
 
 	@GetMapping("/api/users/profile")
 	public ResponseEntity<User> getUserProfileHandler(
-			@RequestHeader("Authorization") String jwt) throws UserException {
+			@RequestHeader("Authorization") String jwt) throws UserException, ProjectException {
 
 		User user = userService.findUserProfileByJwt(jwt);
 		user.setPassword(null);

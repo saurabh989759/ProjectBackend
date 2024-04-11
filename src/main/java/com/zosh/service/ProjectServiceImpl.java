@@ -53,6 +53,8 @@ public class ProjectServiceImpl implements ProjectService {
 			Chat projectChat = chatService.createChat(chat);
 			savedProject.setChat(projectChat);
 
+
+
 		return savedProject;
 	}
 

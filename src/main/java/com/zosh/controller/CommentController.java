@@ -1,6 +1,7 @@
 package com.zosh.controller;
 
 import com.zosh.exception.IssueException;
+import com.zosh.exception.ProjectException;
 import com.zosh.exception.UserException;
 import com.zosh.model.Comment;
 import com.zosh.model.User;
@@ -32,7 +33,7 @@ public class CommentController {
     public ResponseEntity<Comment> createComment(
 
             @RequestBody CreateCommentRequest req,
-            @RequestHeader("Authorization") String jwt) throws UserException, IssueException {
+            @RequestHeader("Authorization") String jwt) throws UserException, IssueException, ProjectException {
         User user = userService.findUserProfileByJwt(jwt);
         Comment createdComment = commentService.createComment(req.getIssueId(), user.getId(), req.getContent());
         return new ResponseEntity<>(createdComment,HttpStatus.CREATED);
@@ -41,7 +42,7 @@ public class CommentController {
     @DeleteMapping("/{commentId}")
     public ResponseEntity<MessageResponse> deleteComment(@PathVariable Long commentId,
 
-                                                         @RequestHeader("Authorization") String jwt) throws UserException, IssueException {
+                                                         @RequestHeader("Authorization") String jwt) throws UserException, IssueException, ProjectException {
         User user = userService.findUserProfileByJwt(jwt);
         commentService.deleteComment(commentId, user.getId());
         MessageResponse res=new MessageResponse();

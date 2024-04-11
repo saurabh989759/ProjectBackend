@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 @Service
 public class SubscriptionServiceImpl implements SubscriptionService{
@@ -29,6 +30,7 @@ public class SubscriptionServiceImpl implements SubscriptionService{
         subscription.setSubscriptionStartDate(LocalDate.now());
         subscription.setSubscriptionEndDate(LocalDate.now().plusMonths(12)); // Assuming one month validity for simplicity
         subscription.setValid(true);
+        subscription.setPlanType(PlanType.FREE);
         subscription.setSubscriptiontype(SubscriptionType.FREE);
         return subscription;
     }
@@ -40,6 +42,11 @@ public class SubscriptionServiceImpl implements SubscriptionService{
            throw new Exception("subscription not found with userId "+userId);
        }
        subscription.setValid(isValid(subscription));
+       if(!isValid(subscription)){
+           subscription.setPlanType(PlanType.FREE);
+           subscription.setSubscriptionEndDate(LocalDate.now().plusMonths(12));
+           subscription.setSubscriptionStartDate(LocalDate.now());
+       }
         return subscriptionRepository.save(subscription);
     }
 

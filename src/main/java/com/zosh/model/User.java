@@ -33,6 +33,8 @@ public class User {
 
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
 	private Subscription subscription;
+
+	private int projectSize=0;
 	
 //    @JsonIgnore
 //    @ManyToMany(mappedBy = "team")

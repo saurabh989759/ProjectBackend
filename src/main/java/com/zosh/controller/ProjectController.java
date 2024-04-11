@@ -68,10 +68,11 @@ public class ProjectController {
     @PostMapping
     public ResponseEntity<Project> createProject(
             @RequestBody Project project,
-                                                 @RequestHeader("Authorization") String token) throws UserException {
+                                                 @RequestHeader("Authorization") String token) throws UserException, ProjectException {
         User user = userService.findUserProfileByJwt(token);
         project.setOwner(user);
         Project createdProject = projectService.createProject(project, user.getId());
+        userService.updateUsersProjectSize(user,1);
         return new ResponseEntity<>(createdProject, HttpStatus.CREATED);
     }
 
@@ -85,10 +86,11 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{projectId}")
-    public ResponseEntity<MessageResponse> deleteProject(@PathVariable Long projectId, @RequestHeader("Authorization") String token) throws UserException {
+    public ResponseEntity<MessageResponse> deleteProject(@PathVariable Long projectId, @RequestHeader("Authorization") String token) throws UserException, ProjectException {
         User user = userService.findUserProfileByJwt(token);
         
         MessageResponse response =new MessageResponse(projectService.deleteProject(projectId, user.getId()));
+        userService.updateUsersProjectSize(user,-1);
         return ResponseEntity.ok(response);
     }
 

@@ -1,5 +1,6 @@
 package com.zosh.controller;
 
+import com.zosh.exception.ProjectException;
 import com.zosh.exception.UserException;
 import com.zosh.model.User;
 import com.zosh.service.UserService;
@@ -47,7 +48,7 @@ import org.springframework.web.bind.annotation.*;
 
         @PatchMapping("/upgrade")
         public ResponseEntity<Subscription> upgradeSubscription(@RequestHeader("Authorization") String jwt,
-                                                                @RequestParam PlanType planType) throws UserException {
+                                                                @RequestParam PlanType planType) throws UserException, ProjectException {
             User user = userService.findUserProfileByJwt(jwt);
             Subscription upgradedSubscription = subscriptionService.upgradeSubscription(user.getId(), planType);
 
