@@ -32,7 +32,7 @@ public class SubscriptionServiceImpl implements SubscriptionService{
         subscription.setValid(true);
         subscription.setPlanType(PlanType.FREE);
         subscription.setSubscriptiontype(SubscriptionType.FREE);
-        return subscription;
+        return subscriptionRepository.save(subscription);
     }
 
     @Override
@@ -55,6 +55,7 @@ public class SubscriptionServiceImpl implements SubscriptionService{
         Subscription subscription = subscriptionRepository.findByUserId(userId);
 
         subscription.setSubscriptiontype(SubscriptionType.PAID);
+
         subscription.setPlanType(planType);
         subscription.setSubscriptionStartDate(LocalDate.now());
         subscription.setValid(true);
@@ -75,12 +76,11 @@ public class SubscriptionServiceImpl implements SubscriptionService{
         }
         LocalDate endDate = subscription.getSubscriptionEndDate();
         LocalDate currentDate = LocalDate.now();
+//        System.out.println( "--------- "+endDate+"----"+currentDate);
+//        System.out.println( endDate.isAfter(currentDate) );
+//        System.out.println( endDate.isEqual(currentDate));
 
-        if (endDate.isBefore(currentDate) ||  endDate.isEqual(currentDate)) {
-            return true;
-        } else {
-            return false;
-        }
+        return endDate.isAfter(currentDate) || endDate.isEqual(currentDate);
 
 
     }

@@ -31,8 +31,9 @@ public class User {
 	@OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL)
     private List<Issue> assignedIssues = new ArrayList<>();
 
-	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-	private Subscription subscription;
+
+//	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+//	private Subscription subscription;
 
 	private int projectSize=0;
 	

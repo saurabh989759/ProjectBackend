@@ -26,7 +26,6 @@ public class Subscription {
 
     private boolean isValid;
 
-    @JsonIgnore
     @OneToOne
     private User user;
 
